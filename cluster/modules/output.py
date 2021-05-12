@@ -34,20 +34,27 @@ class Output:
 
     # sorts data by given field
     def sort_data(data, field):
-        if field:
-            data.sort(key=lambda x: x[int(field)])
-        else:
-            data.sort(key=lambda x: x[0])
+        try:
+            if field:
+                data.sort(key=lambda x: x[int(field)])
+            else:
+                data.sort(key=lambda x: x[0])
+        except AttributeError:
+            print("Empty data received!")
+            exit()
         return data
 
 
     # prints table from lists of lists: data
     def print_table(data, headers, verbose):
-        if verbose and len(data) != 0:
-            table = columnar(data, headers, no_borders=True, row_sep='-')
-            print (table)
-        else:
-            return
+        try:
+            if verbose and len(data) != 0:
+                table = columnar(data, headers, no_borders=True, row_sep='-')
+                print (table)
+        except:
+            print("Empty/Incorrect data received!")
+            exit()
+
 
     # prints analysis in bar format with %age, count and message
     def bar(data, resource, k8s_object):

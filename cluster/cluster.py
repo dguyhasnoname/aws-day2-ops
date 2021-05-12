@@ -88,8 +88,8 @@ def main():
         # Cluster.get_cluster_details(options[1])
         # Cluster.get_ec2_details(options[1], options[4])
         # Cluster.get_asg_details(options[1], options[4])
-        # Cluster.get_elb_details(options[1], options[4], options[6])
-        Cluster.get_ec2_volume_details(options[1], options[4])
+        Cluster.get_elb_details(options[1], options[4], options[6])
+        # Cluster.get_ec2_volume_details(options[1], options[4])
     Output.time_taken(start_time)
 
 
