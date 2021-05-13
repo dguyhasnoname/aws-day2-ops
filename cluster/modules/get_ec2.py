@@ -5,20 +5,22 @@ class _Ec2():
         ec2_client = session.client('ec2')
         ec2_list = ec2_client.describe_instances()
         ec2_list = ec2_list.get('Reservations')
-        ec2_instance_list, all_ec2_instance_list, role, asg, ec2_data = [], [], '', '', []
+        ec2_instance_list, all_ec2_instance_list, ec2_data = [], [], []
         for groups in ec2_list:
             for ec2 in groups['Instances']:
-                ec2_struct = [ec2['PrivateDnsName'], \
-                                role, \
-                                ec2['InstanceType'], \
-                                ec2['State']['Name'], \
-                                ec2['Placement']['AvailabilityZone'], \
-                                asg]                
+                role, asg = '', ''               
                 for tag in ec2['Tags']:
                     if 'k8s.io/role' in tag['Key']:
                         role = tag['Key'].split('/')[-1]
                     if tag['Key'] == 'aws:autoscaling:groupName':
                         asg = tag['Value']
+                        ec2_struct = [ec2['PrivateDnsName'], \
+                                        role, \
+                                        ec2['InstanceType'], \
+                                        ec2['State']['Name'], \
+                                        ec2['Placement']['AvailabilityZone'], \
+                                        asg, \
+                                        ec2['LaunchTime']]
                         if cluster:
                             if cluster in tag['Value']:
                                 ec2_instance_list.append(ec2_struct)

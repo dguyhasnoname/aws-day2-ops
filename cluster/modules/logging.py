@@ -8,7 +8,7 @@ class Logger():
         if format == 'json':
             formatter = logging.Formatter('{"time": "%(asctime)s", "origin": "%(name)s", "log_level": "%(levelname)s", "log": "%(message)s"}')
         else:
-            formatter = logging.Formatter("[%(levelname)s] %(asctime)s %(name)s: %(message)s")
+            formatter = logging.Formatter("[%(levelname)s] %(asctime)s p%(process)s %(name)s:%(lineno)d %(message)s")
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.DEBUG)
         console_handler.setFormatter(formatter)

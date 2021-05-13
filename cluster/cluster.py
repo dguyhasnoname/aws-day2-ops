@@ -7,6 +7,7 @@ from modules.login import Login
 from modules.get_acm import _ACM
 from modules.get_ec2 import _Ec2
 from modules.get_elb import _Elb
+#from modules.get_asg import GetAsg
 
 logger = Logger.get_logger('Cluster.py', '')
 
@@ -27,7 +28,6 @@ Before running script export KUBECONFIG file as env:
     parser.parse_args()
 
 class Cluster():
-    # from modules.get_asg import _ASG
     def get_cluster_list():
         certs = _ACM.get_acm(session)
         return certs
@@ -50,7 +50,7 @@ class Cluster():
 
     def get_ec2_details(cluster, sort):
         ec2 = _Ec2.get_ec2_cluster(session, cluster)
-        ec2_header = ['Node Name', 'role', 'Instance Type', 'Status', 'AZ', 'asg']
+        ec2_header = ['Node_Name', 'role', 'Instance_Type', 'Status', 'AZ', 'asg', 'launch_time']
         ec2 = Output.sort_data(ec2, sort)
         Output.print_table(ec2, ec2_header, True)
         bastion = _Ec2.get_ec2_bastion(cluster)
@@ -58,7 +58,7 @@ class Cluster():
         Output.print_table(bastion, bastion_header, True)
 
     def get_asg_details(cluster, sort):
-        asg = _ASG.get_asg(session, cluster)
+        asg = GetAsg.get_asg(session, cluster)
         asg = Output.sort_data(asg, sort)
         asg_header = ['name', 'desired/min/max', 'lb', 'az']
         Output.print_table(asg, asg_header, True)
@@ -86,9 +86,9 @@ def main():
     else:
         session = Login.aws_session(options[2])
         # Cluster.get_cluster_details(options[1])
-        # Cluster.get_ec2_details(options[1], options[4])
+        Cluster.get_ec2_details(options[1], options[4])
         # Cluster.get_asg_details(options[1], options[4])
-        Cluster.get_elb_details(options[1], options[4], options[6])
+        # Cluster.get_elb_details(options[1], options[4], options[6])
         # Cluster.get_ec2_volume_details(options[1], options[4])
     Output.time_taken(start_time)
 

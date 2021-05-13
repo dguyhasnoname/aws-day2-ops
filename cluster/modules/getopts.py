@@ -2,9 +2,10 @@ import getopt, sys
 
 class GetOpts:
     def get_opts():
-        help, cluster, profile, output, sort, filter, namespace, verbose ='', '', '', '', '', '', '', ''
+        help, cluster, profile, output, sort, filter, verbose, update, delete =  [''] *  9
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hc:p:o:s:f:v", ["help", "cluster=", "profile=", "output=", "sort=", "filter=", "verbose="])
+            opts, args = getopt.getopt(sys.argv[1:], "hc:p:o:s:f:vu:d", \
+                ["help", "cluster=", "profile=", "output=", "sort=", "filter=", "verbose", "update=", "delete"])
         except getopt.GetoptError as err:
             print("[ERROR] {}. ".format(err) + \
             "Please run script with -h flag to see valid options.")
@@ -24,8 +25,11 @@ class GetOpts:
             elif o in ("-f", "--filter"):
                 filter = a
             elif o in ("-v", "--verbose"):
-                verbose = True                                                                                       
- 
+                verbose = True
+            elif o in ("-u", "--update"):
+                update = a
+            elif o in ("-d", "--delete"):
+                delete = True               
 
-        options = [help, cluster, profile, output, sort, filter, verbose]
-        return options 
+        options = [help, cluster, profile, output, sort, filter, verbose, update, delete]
+        return options
