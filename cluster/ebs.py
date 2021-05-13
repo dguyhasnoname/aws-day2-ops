@@ -11,17 +11,17 @@ logger = Logger.get_logger('asg.py', '')
 
 def usage():
     parser=argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-        description="""This script can be used to see resource usage in kubernetes cluster.
+        description="""This script can be used to /getdelete volumes from an AWS account.
 
-Before running script export KUBECONFIG file as env:
-    export KUBECONFIG=<kubeconfig file location>
-    
-    e.g. export KUBECONFIG=/Users/dguyhasnoname/kubeconfig\n""",
+Before running script export AWS_REGION & AWS_PROFILE file as env:
+
+    export AWS_PROFILE=NDM_MKE_TEST
+    export AWS_REGION=us-east-1\n""",
         epilog="""All's well that ends well.""")
     
     parser.add_argument('-s', '--sort', action="store_true", help="sort by. Default sorting is by name.")
     parser.add_argument('-c', '--cluster', action="store_true", help="cluster name for which details has to be fetched")
-    parser.add_argument('-d', '--delete', action="store_true", help="asg group type. Valid inputs etcd|master|worker|all")
+    parser.add_argument('-d', '--delete', action="store_true", help="if flag set, deletes the volume.")
     parser.parse_args()
 
 class EBS():
