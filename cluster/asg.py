@@ -15,7 +15,7 @@ def usage():
 
 Before running script export AWS_REGION & AWS_PROFILE file as env:
 
-    export AWS_PROFILE=NDM_MKE_TEST
+    export AWS_PROFILE=MY_TEST
     export AWS_REGION=us-east-1\n""",
         epilog="""All's well that ends well.""")
     
