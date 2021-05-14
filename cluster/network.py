@@ -4,7 +4,7 @@ from modules.getopts import GetOpts
 from modules.output import Output
 from modules.logging import Logger
 from modules.login import Login
-from modules.get_vpc import _VPC
+from modules.get_vpc import GetVPC
 
 logger = Logger.get_logger('')
 
@@ -24,10 +24,20 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
 
 class VPC():
     def get_vpc_details(cluster, sort, verbose):
-        vpc =  _VPC.get_vpc(session)
+        vpc =  GetVPC.get_vpc(session, cluster)
         vpc_header = ['id', 'name', 'cidr', 'is_default', 'state', 'owner_id']
         vpc = Output.sort_data(vpc, sort)
-        Output.print_table(vpc, vpc_header, True)        
+        Output.print_table(vpc, vpc_header, True)
+
+    def get_nacl_details(cluster, output, sort):
+        nacl =  GetVPC.get_nacls(session, cluster) 
+        nacl_header = ['ACL_NAME', 'IS_DEFAULT', 'VPC_ID', 'EGRESS_RULES', 'INGRESS_RULES', 'ACL_ID', 'SUBNETS']
+        nacl = Output.sort_data(nacl, sort)
+        # Output.print_table(nacl, nacl_header, True)
+        if 'table' in output:
+            Output.print_table(nacl, nacl_header, True)
+        elif 'tree' in output: 
+            Output.print_tree(nacl, nacl_header)           
 
 def main():
     global session
@@ -36,7 +46,8 @@ def main():
         usage()
     else:
         session = Login.aws_session(options[2], logger)
-        VPC.get_vpc_details(options[1], options[4], options[6])
+        # VPC.get_vpc_details(options[1], options[4], options[6])
+        VPC.get_nacl_details(options[1], options[3], options[4])
     Output.time_taken(start_time)
 
 

@@ -1,4 +1,3 @@
-from .logging import Logger
 # from .login import Login
 
 # class GetAsg():
@@ -17,10 +16,9 @@ from .logging import Logger
 #                                 asg['Instances']])
 #         return all_asg_list
 
-logger = Logger.get_logger('modules/get_asg.py', '')
 
 class GetAsg():
-    def get_asg(session, cluster):
+    def get_asg(session, cluster, logger):
         global asg_client, asg_data
         asg_client = session.client('autoscaling')
         paginator = asg_client.get_paginator('describe_auto_scaling_groups')
@@ -49,7 +47,7 @@ class GetAsg():
             asg_data = all_asg_list
         return asg_data
 
-    def update_asg(session, cluster, update):
+    def update_asg(session, cluster, update, logger):
         # asg_data = GetAsg.get_asg(session, cluster)
 
         def update_auto_scaling_group(asg):

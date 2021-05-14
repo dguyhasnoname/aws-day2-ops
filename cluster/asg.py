@@ -27,7 +27,7 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
 class ASG():
     def get_asg_details(cluster, profile, sort):
         session = Login.aws_session(profile, logger)
-        asg = GetAsg.get_asg(session, cluster)
+        asg = GetAsg.get_asg(session, cluster, logger)
         asg = Output.sort_data(asg, sort)
         asg_header = ['name', 'desired/min/max', 'lb', 'az']
         Output.print_table(asg, asg_header, True)
@@ -36,14 +36,14 @@ class ASG():
         if update:
             if cluster:
                 logger.info("Getting asg details.")
-                ASG.get_asg_details(cluster, session, sort)
+                ASG.get_asg_details(cluster, session, sort, logger)
                 if 'y' in input("Do you want to update asg intances? y|n: "):
-                    GetAsg.update_asg(session, cluster, update)
+                    GetAsg.update_asg(session, cluster, update, logger)
             else:
                 logger.warning("Please pass name of cluster for which asg needs to be updated!")
                 logger.info("Pulling asg details for all clusters.")
                 if 'y' in input("Do you want to get asg details for all clustes? y|n: "):
-                    ASG.get_asg_details(cluster, session, sort)
+                    ASG.get_asg_details(cluster, session, sort, logger)
 
 def main():
     options = GetOpts.get_opts()

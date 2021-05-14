@@ -25,14 +25,19 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
     parser.parse_args()
 
 class Ec2():
-    def get_ec2_details(cluster, sort):
+    def get_ec2_details(cluster, output, sort):
         ec2 = GetEc2.get_ec2_cluster(session, cluster)
-        ec2_header = ['Node_Name', 'role', 'Instance_Type', 'Status', 'AZ', 'asg', 'launch_time']
+        ec2_header = ['NODE_NAME', 'ROLE', 'INSTANCE_TYPE', 'STATUS', 'AZ', 'ASG', 'LAUNCH_TIME']
+        bastion_header = ['BASTION NAME', 'DNS NAME', 'PUBLIC IP', 'START TIME']
         ec2 = Output.sort_data(ec2, sort)
-        Output.print_table(ec2, ec2_header, True)
         bastion = GetEc2.get_ec2_bastion(cluster)
-        bastion_header = ['bastion name', 'dns name', 'public ip', 'Start time']
-        Output.print_table(bastion, bastion_header, True)
+        if 'table' in output:
+            Output.print_table(ec2, ec2_header, True)
+            Output.print_table(bastion, bastion_header, True)
+        elif 'tree' in output:
+            Output.print_tree(ec2, ec2_header)
+            Output.print_tree(bastion, bastion_header)            
+
 
     def get_ec2_volume_details(cluster, sort):
         ec2_ebs_vol = GetEc2.get_ec2_volumes(session, cluster)
@@ -47,7 +52,7 @@ def main():
         usage()
     else:
         session = Login.aws_session(options[2], logger)
-        Ec2.get_ec2_details(options[1], options[4])
+        Ec2.get_ec2_details(options[1], options[3], options[4])
         # Cluster.get_ec2_volume_details(options[1], options[4])
     Output.time_taken(start_time)
 

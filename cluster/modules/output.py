@@ -55,6 +55,27 @@ class Output:
             print("Empty/Incorrect data received!")
             exit()
 
+    def print_tree(data, headers):
+        h = sorted(headers[1:], key=len)
+        for d in data:
+            heading = headers[0] + ": " + d[0]
+            
+            print(heading)
+            for i in range(len(headers)):
+                try:
+                    #https://www.compart.com/en/unicode/mirrored
+                    if not '\n' in d[i+1]:
+                        print("".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1].ljust(len(h[-1])) + ": " + str(d[i+1]))
+                    else:
+                        padding = "".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1]
+                        print(padding)
+                        for x in d[i+1].split("\n"):
+                            print("".ljust(len(padding)) + u"\u2309\u169B\u22B8" + str(x))                     
+                    # print("".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1].ljust(len(h[-1])) + ": " + str(d[i+1]))
+                except:
+                    pass
+            Output.separator(Output.YELLOW, '.' , '')
+            
 
     # prints analysis in bar format with %age, count and message
     def bar(data, resource, k8s_object):

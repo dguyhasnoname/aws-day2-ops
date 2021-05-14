@@ -21,7 +21,6 @@ class GetEc2():
                                 ec2['Placement']['AvailabilityZone'], \
                                 asg, \
                                 ec2['LaunchTime']]
-                print(ec2_struct)
                 if cluster:
                     if cluster in asg:
                         ec2_instance_list.append(ec2_struct)
