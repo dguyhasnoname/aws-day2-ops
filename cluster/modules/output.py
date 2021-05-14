@@ -59,7 +59,7 @@ class Output:
         h = sorted(headers[1:], key=len)
         for d in data:
             heading = headers[0] + ": " + d[0]
-            
+            Output.separator(Output.YELLOW, '.' , '')
             print(heading)
             for i in range(len(headers)):
                 try:
@@ -74,8 +74,6 @@ class Output:
                     # print("".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1].ljust(len(h[-1])) + ": " + str(d[i+1]))
                 except:
                     pass
-            Output.separator(Output.YELLOW, '.' , '')
-            
 
     # prints analysis in bar format with %age, count and message
     def bar(data, resource, k8s_object):
