@@ -1,5 +1,5 @@
 
-class _Ec2():
+class GetEc2():
     def get_ec2_cluster(session, cluster):
         global ec2_list, ec2_client
         ec2_client = session.client('ec2')
@@ -10,22 +10,23 @@ class _Ec2():
             for ec2 in groups['Instances']:
                 role, asg = '', ''               
                 for tag in ec2['Tags']:
-                    if 'k8s.io/role' in tag['Key']:
+                    if 'role' in tag['Key']:
                         role = tag['Key'].split('/')[-1]
                     if tag['Key'] == 'aws:autoscaling:groupName':
                         asg = tag['Value']
-                        ec2_struct = [ec2['PrivateDnsName'], \
-                                        role, \
-                                        ec2['InstanceType'], \
-                                        ec2['State']['Name'], \
-                                        ec2['Placement']['AvailabilityZone'], \
-                                        asg, \
-                                        ec2['LaunchTime']]
-                        if cluster:
-                            if cluster in tag['Value']:
-                                ec2_instance_list.append(ec2_struct)
-                        else:
-                            all_ec2_instance_list.append(ec2_struct)
+                ec2_struct = [ec2['PrivateDnsName'], \
+                                role, \
+                                ec2['InstanceType'], \
+                                ec2['State']['Name'], \
+                                ec2['Placement']['AvailabilityZone'], \
+                                asg, \
+                                ec2['LaunchTime']]
+                print(ec2_struct)
+                if cluster:
+                    if cluster in asg:
+                        ec2_instance_list.append(ec2_struct)
+                else:
+                    all_ec2_instance_list.append(ec2_struct)
         if ec2_instance_list:
             ec2_data = ec2_instance_list
         else:

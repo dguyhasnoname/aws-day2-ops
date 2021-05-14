@@ -4,10 +4,7 @@ from modules.getopts import GetOpts
 from modules.output import Output
 from modules.logging import Logger
 from modules.login import Login
-from modules.get_acm import _ACM
-from modules.get_ec2 import _Ec2
-from modules.get_elb import _Elb
-#from modules.get_asg import GetAsg
+from modules.get_ec2 import GetEc2
 
 logger = Logger.get_logger('')
 
@@ -27,53 +24,18 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
     parser.add_argument('-o', '--output', action="store_true", help="for output in json format pass json. Default is plain text")
     parser.parse_args()
 
-class Cluster():
-    def get_cluster_list():
-        certs = _ACM.get_acm(session)
-        return certs
-    
-    def get_cluster_details(cluster):
-        all_cluster_data, cluster_data = [], []
-        certs = Cluster.get_cluster_list()
-        for cert in certs:
-            cluster_name = cert[0]
-            cluster_acm = cert[1]
-            if cluster and cluster in cluster_name:
-                cluster_data.append([cluster_name, cluster_acm, cert[2]])
-            else:
-                all_cluster_data.append([cluster_name, cluster_acm, cert[2]])
-        header = ['DomainName', 'ACM', 'Status']
-        if cluster:
-            Output.print_table(cluster_data, header, True)
-        else:
-            Output.print_table(all_cluster_data, header, True)
-
+class Ec2():
     def get_ec2_details(cluster, sort):
-        ec2 = _Ec2.get_ec2_cluster(session, cluster)
+        ec2 = GetEc2.get_ec2_cluster(session, cluster)
         ec2_header = ['Node_Name', 'role', 'Instance_Type', 'Status', 'AZ', 'asg', 'launch_time']
         ec2 = Output.sort_data(ec2, sort)
         Output.print_table(ec2, ec2_header, True)
-        bastion = _Ec2.get_ec2_bastion(cluster)
+        bastion = GetEc2.get_ec2_bastion(cluster)
         bastion_header = ['bastion name', 'dns name', 'public ip', 'Start time']
         Output.print_table(bastion, bastion_header, True)
 
-    def get_asg_details(cluster, sort):
-        asg = GetAsg.get_asg(session, cluster)
-        asg = Output.sort_data(asg, sort)
-        asg_header = ['name', 'desired/min/max', 'lb', 'az']
-        Output.print_table(asg, asg_header, True)
-
-    def get_elb_details(cluster, sort, verbose):
-        elb = _Elb.get_elb(session, cluster, verbose)
-        elb = Output.sort_data(elb, sort)
-        if verbose:
-            elb_header = ['name', 'facing', 'listner', 'cluster', 'namespace', 'accesslogs', 'cross-zone', 'dns']
-        else:
-            elb_header = ['name', 'facing', 'listner', 'cluster']
-        Output.print_table(elb, elb_header, True)
-
     def get_ec2_volume_details(cluster, sort):
-        ec2_ebs_vol = _Ec2.get_ec2_volumes(session, cluster)
+        ec2_ebs_vol = GetEc2.get_ec2_volumes(session, cluster)
         ec2_ebs_header = ['volume_id', 'name', 'state', 'encryption', 'device', 'delete_on_termination']
         ec2_ebs_vol = Output.sort_data(ec2_ebs_vol, sort)
         Output.print_table(ec2_ebs_vol, ec2_ebs_header, True)
@@ -85,10 +47,7 @@ def main():
         usage()
     else:
         session = Login.aws_session(options[2], logger)
-        # Cluster.get_cluster_details(options[1])
-        Cluster.get_ec2_details(options[1], options[4])
-        # Cluster.get_asg_details(options[1], options[4])
-        # Cluster.get_elb_details(options[1], options[4], options[6])
+        Ec2.get_ec2_details(options[1], options[4])
         # Cluster.get_ec2_volume_details(options[1], options[4])
     Output.time_taken(start_time)
 

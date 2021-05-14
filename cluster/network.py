@@ -6,7 +6,7 @@ from modules.logging import Logger
 from modules.login import Login
 from modules.get_vpc import _VPC
 
-logger = Logger.get_logger('Cluster.py', '')
+logger = Logger.get_logger('')
 
 def usage():
     parser=argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -35,7 +35,7 @@ def main():
     if options[0]:
         usage()
     else:
-        session = Login.aws_session(options[2])
+        session = Login.aws_session(options[2], logger)
         VPC.get_vpc_details(options[1], options[4], options[6])
     Output.time_taken(start_time)
 

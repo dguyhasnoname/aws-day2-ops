@@ -7,7 +7,7 @@ from modules.login import Login
 from modules.get_ebs import GetEbs
 
 global session
-logger = Logger.get_logger('asg.py', '')
+logger = Logger.get_logger('')
 
 def usage():
     parser=argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -26,7 +26,7 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
 
 class EBS():
     def get_ebs_volumes_details(cluster, profile, sort):
-        session = Login.aws_session(profile)
+        session = Login.aws_session(profile, logger)
         ebs_volumes = GetEbs.get_ebs_volumes(session, cluster)
         ec2_ebs_header = ['volume_id', 'name', 'size', 'state', 'encryption', 'type', 'device', 'delete_on_termination', 'iops']
         ebs_volumes = Output.sort_data(ebs_volumes, sort)

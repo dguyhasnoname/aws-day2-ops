@@ -1,10 +1,7 @@
-import boto3, os
-from .logging import Logger
-
-logger = Logger.get_logger('modules/login.py', '')
+import boto3, os, time
 
 class Login():
-    def aws_session(profile):
+    def aws_session(profile, logger):
         AWS_PROFILE = profile
         AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
@@ -16,7 +13,7 @@ class Login():
                 region_name = AWS_REGION
             )
         else:
-            logger.info("Using aws config from ~/.aws/config for profile: "  + AWS_PROFILE )
+            logger.info("Creating session for profile: "  + AWS_PROFILE )
             session = boto3.Session(profile_name=AWS_PROFILE)
 
         return session

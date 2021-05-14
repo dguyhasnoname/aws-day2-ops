@@ -7,7 +7,7 @@ from modules.login import Login
 from modules.get_asg import GetAsg
 
 global session
-logger = Logger.get_logger('asg.py', '')
+logger = Logger.get_logger('')
 
 def usage():
     parser=argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -26,7 +26,7 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
 
 class ASG():
     def get_asg_details(cluster, profile, sort):
-        session = Login.aws_session(profile)
+        session = Login.aws_session(profile, logger)
         asg = GetAsg.get_asg(session, cluster)
         asg = Output.sort_data(asg, sort)
         asg_header = ['name', 'desired/min/max', 'lb', 'az']

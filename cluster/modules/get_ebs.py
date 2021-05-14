@@ -1,5 +1,5 @@
 from .logging import Logger
-logger = Logger.get_logger('modules/get_asg.py', '')
+logger = Logger.get_logger('')
 
 class GetEbs():
     def get_ebs_volumes(session, cluster):
