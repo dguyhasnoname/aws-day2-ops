@@ -76,28 +76,31 @@ class Output:
                     pass
 
     # prints analysis in bar format with %age, count and message
-    def bar(data, resource, k8s_object):
-        total_cpu = re.sub('[^0-9]','', data[-1][1])
-        total_mem = re.sub('[^0-9]','', data[-1][2])
-        i = 0
-        for line in data:
-            show_bar = []
-            cpu_used = re.sub('[^0-9]','', line[1])
-            mem_used = re.sub('[^0-9]','', line[2])
-            cpu_percentage = round((100 * int(cpu_used) / int(total_cpu)), 2)
-            mem_percentage = round((100 * int(mem_used) / int(total_mem)), 2)
-
-            for i in range(15):
-                if int(i) < cpu_percentage / 4:
-                    show_bar.append(u'\u2588')
-                else:
-                    show_bar.append(u'\u2591')
-            if 'Total:' not in line[0]:
-                line.insert(2, "{} {}%".format("".join(show_bar), round(cpu_percentage, 1)))
-                line.append("{} {}%".format("".join(show_bar), round(mem_percentage, 1)))
-            else:
-                line.insert(2, '')
-                line.append('')
-            
-        return data
+    def print_json(i, data, headers):
+        # for i in range(len(headers)):
+        #     for d in data:
+        #         if not '\n' in d[i]:
+        #             for x in d[i].split("\n"):
+        #                 sub_key_json.append(x)
+        #             json_obj.update({headers[i].lower(): sub_key_json})
+        #         else:
+        #             json_obj.update({headers[i].lower(): d[i]})
         
+        json_data = []
+        headers = [x.lower() for x in headers]
+        for item in data:
+            temp_dic = {}
+            # storing json data in dict for each list in data
+            for i in range(len(headers)):
+                for j in range(len(item)):
+                    if not '\n' in item[i]:
+                        temp_dic.update({headers[i]: item[i]})
+                    else:
+                        item[i].split("\n")
+                        temp_dic.update({headers[i]: item[i].split("\n")})
+
+            # appending all json dicts to form a list
+            json_data.append(temp_dic)
+     
+        print(json.dumps(json_data))
+        return json.dumps(json_data)

@@ -37,7 +37,9 @@ class VPC():
         if 'table' in output:
             Output.print_table(nacl, nacl_header, True)
         elif 'tree' in output: 
-            Output.print_tree(nacl, nacl_header)           
+            Output.print_tree(nacl, nacl_header)
+        elif 'json' in output:
+            Output.print_json('NACL', nacl, nacl_header)           
 
 def main():
     global session
