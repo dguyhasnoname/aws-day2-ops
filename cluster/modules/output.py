@@ -15,6 +15,7 @@ class Output:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
     RESET = '\033[0m'
+    MARKER = u"\u2309\u169B\u22B8"
     # u'\u2717' means values is None or not defined
     # u'\u2714' means value is defined
 
@@ -62,31 +63,38 @@ class Output:
 
     # prints data in tree format from lists data and headers
     def print_tree(data, headers):
-        h = sorted(headers[1:], key=len)
+        h = sorted(headers[1:], key=len)    # sorting to find longest element in headers for :
         for d in data:
             heading = headers[0] + ": "
             Output.separator(Output.YELLOW, '.' , '')
             print(Output.BOLD + heading + d[0] + Output.RESET)
+
+            # printing the tree
             for i in range(len(headers)):
                 try:
                     #https://www.compart.com/en/unicode/mirrored
+                    # printing 2nd level tree in if condition
                     if not '\n' in d[i+1]:
-                        print("".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1].ljust(len(h[-1])) + ": " + str(d[i+1]))
+                        print("".ljust(len(heading)) + Output.MARKER + headers[i+1].ljust(len(h[-1])) + ": " + str(d[i+1]))
                     else:
-                        i_padding = "".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1] + ": "
+                        i_padding = "".ljust(len(heading)) + Output.MARKER + headers[i+1] + ": "
                         print(i_padding)
+
+                        # printing 3rd level tree in else condition
                         for x in d[i+1].split("\n"):
-                            # print("".ljust(len(i_padding)) + u"\u2309\u169B\u22B8" + str(x))
+                            # print("".ljust(len(i_padding)) + Output.MARKER + str(x))
                             if '[' in x:
-                                x = ast.literal_eval(x)                           
+                                x = ast.literal_eval(x)
+
+                                # printing 4th level tree in else condition                          
                                 for j in x:
-                                    y_padding = i_padding + u"\u2309\u169B\u22B8" + previous
-                                    print("".ljust(len(y_padding)) + u"\u2309\u169B\u22B8" + j)
+                                    y_padding = i_padding + Output.MARKER + previous
+                                    print("".ljust(len(y_padding)) + Output.MARKER + j)
                             else:
-                                print("".ljust(len(i_padding)) + u"\u2309\u169B\u22B8" + x)
+                                print("".ljust(len(i_padding)) + Output.MARKER + x)
                                 previous = x
 
-                    # print("".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1].ljust(len(h[-1])) + ": " + str(d[i+1]))
+                    # print("".ljust(len(heading)) + Output.MARKER + headers[i+1].ljust(len(h[-1])) + ": " + str(d[i+1]))
                 except:
                     pass
 
