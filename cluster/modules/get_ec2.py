@@ -14,13 +14,25 @@ class GetEc2():
                         role = tag['Key'].split('/')[-1]
                     if tag['Key'] == 'aws:autoscaling:groupName':
                         asg = tag['Value']
+                volume= ''
+                try:
+                    for device in ec2['BlockDeviceMappings']:
+                        volume = volume + device['DeviceName'] + ': ' + device['Ebs']['VolumeId']  + '\n' 
+                except KeyError:
+                    pass
+                volume = volume.rstrip('\n')
                 ec2_struct = [ec2['PrivateDnsName'], \
                                 role, \
                                 ec2['InstanceType'], \
                                 ec2['State']['Name'], \
                                 ec2['Placement']['AvailabilityZone'], \
                                 asg, \
-                                ec2['LaunchTime']]
+                                ec2['LaunchTime'], \
+                                ec2['ImageId'], \
+                                ec2['PrivateIpAddress'], \
+                                ec2['SubnetId'], \
+                                ec2['VpcId'], \
+                                volume]
                 if cluster:
                     if cluster in asg:
                         ec2_instance_list.append(ec2_struct)
@@ -40,7 +52,7 @@ class GetEc2():
                     if tag['Key'] == 'Name' and all(x in tag['Value'] for x in ['bastion', cluster]):
                         bastion_name = tag['Value']
                         try:
-                            bastion_details.append([bastion_name, ec2['PublicDnsName'], ec2['PublicIpAddress'], ec2['LaunchTime']])
+                            bastion_details.append([bastion_name, ec2['PublicDnsName'], ec2['PublicIpAddress'], ec2['LaunchTime'], ec2['ImageId']])
                         except KeyError:
                             continue
         return  bastion_details                                                                     

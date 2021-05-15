@@ -5,12 +5,16 @@ import os, re, time, requests, json, ast
 #from .logging import Logger
 
 class Output:
-    RED = '\033[31m'
-    GREEN = '\033[32m'
-    YELLOW = '\033[33m'
-    CYAN = '\033[36m'
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
     RESET = '\033[0m'
-    BOLD = '\033[1;30m'
     # u'\u2717' means values is None or not defined
     # u'\u2714' means value is defined
 
@@ -62,7 +66,7 @@ class Output:
         for d in data:
             heading = headers[0] + ": "
             Output.separator(Output.YELLOW, '.' , '')
-            print(heading + d[0])
+            print(Output.BOLD + heading + d[0] + Output.RESET)
             for i in range(len(headers)):
                 try:
                     #https://www.compart.com/en/unicode/mirrored

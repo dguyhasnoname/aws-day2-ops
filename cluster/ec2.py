@@ -25,8 +25,8 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
 class Ec2():
     def get_ec2_details(cluster, output, sort):
         ec2 = GetEc2.get_ec2_cluster(session, cluster)
-        ec2_header = ['NODE_NAME', 'ROLE', 'INSTANCE_TYPE', 'STATUS', 'AZ', 'ASG', 'LAUNCH_TIME']
-        bastion_header = ['BASTION NAME', 'DNS NAME', 'PUBLIC IP', 'START TIME']
+        ec2_header = ['node_name', 'role', 'instance_type', 'status', 'az', 'asg', 'launch_time', 'ami', 'pvt_ip_addr', 'subnet', 'vpc_id', 'volume']
+        bastion_header = ['bastion name', 'dns name', 'public ip', 'start time', 'ami']
         ec2 = Output.sort_data(ec2, sort)
         bastion = GetEc2.get_ec2_bastion(cluster)
         Output.print(ec2, ec2_header, output, logger)
