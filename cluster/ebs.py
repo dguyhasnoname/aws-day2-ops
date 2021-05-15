@@ -6,9 +6,6 @@ from modules.logging import Logger
 from modules.login import Login
 from modules.get_ebs import GetEbs
 
-global session
-logger = Logger.get_logger('')
-
 def usage():
     parser=argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""This script can be used to /getdelete volumes from an AWS account.
@@ -25,34 +22,36 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
     parser.parse_args()
 
 class EBS():
-    def get_ebs_volumes_details(cluster, profile, sort):
-        session = Login.aws_session(profile, logger)
-        ebs_volumes = GetEbs.get_ebs_volumes(session, cluster)
+    def get_ebs_volumes_details(cluster, output, sort):
+        ebs_volumes = GetEbs.get_ebs_volumes(session, cluster, logger)
         ec2_ebs_header = ['volume_id', 'name', 'size', 'state', 'encryption', 'type', 'device', 'delete_on_termination', 'iops']
         ebs_volumes = Output.sort_data(ebs_volumes, sort)
-        Output.print_table(ebs_volumes, ec2_ebs_header, True)        
+        Output.print(ebs_volumes, ec2_ebs_header, output, logger)        
 
-    def delete_volumes(cluster, session, sort, delete):
+    def delete_volumes(cluster, sort, delete):
         if delete:
             if cluster:
                 logger.info("Getting ebs volume details.")
                 EBS.get_ebs_volumes_details(cluster, session, sort)
                 if 'y' in input("Do you want to delete ebs volumes? y|n: "):
-                    GetEbs.delete_ebs_volumes(cluster)
+                    GetEbs.delete_ebs_volumes(cluster, logger)
             else:
                 logger.warning("Please pass name of cluster for which ebs volumes need to be deleted!")
                 if 'y' in input("Do you want to get ebs volumes details for all clustes? y|n: "):
                     logger.info("Pulling ebs volumes details for all clusters.")
-                    EBS.get_ebs_volumes_details(cluster, session, sort)
+                    EBS.get_ebs_volumes_details(cluster, session, sort, logger)
 
 def main():
+    global session, logger
     options = GetOpts.get_opts()
+    logger = Logger.get_logger(options[3])
     if options[0]:
         usage()
+    session = Login.aws_session(options[2], logger)
     if options[8]:
-        EBS.delete_volumes(options[1], options[2], options[4], options[8])        
+        EBS.delete_volumes(options[1], options[4], options[8])        
     else:
-        EBS.get_ebs_volumes(options[1], options[2], options[4])
+        EBS.get_ebs_volumes_details(options[1], options[3], options[4])
     Output.time_taken(start_time)
 
 if __name__ == "__main__":

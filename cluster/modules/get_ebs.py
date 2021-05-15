@@ -1,8 +1,5 @@
-from .logging import Logger
-logger = Logger.get_logger('')
-
 class GetEbs():
-    def get_ebs_volumes(session, cluster):
+    def get_ebs_volumes(session, cluster, logger):
         global ebs_list, ebs_client, volumes
         volumes, cluster_volume, all_volumes = [], [], []
         ebs_client = session.client('ec2')
@@ -34,7 +31,7 @@ class GetEbs():
             volumes = all_volumes
         return volumes
     
-    def delete_ebs_volumes(cluster):
+    def delete_ebs_volumes(cluster, logger):
         def delete(volume_id):
             del_vol = ebs_client.delete_volume(VolumeId=volume_id)
             if del_vol['ResponseMetadata']['HTTPStatusCode'] == 200:

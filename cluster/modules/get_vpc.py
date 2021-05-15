@@ -57,3 +57,37 @@ class GetVPC():
             nacl_details = all_nacl_details
         return nacl_details
 
+    def get_subnets(session, cluster):
+        sn_client = session.client('ec2')
+        sn_list = sn_client.describe_subnets()
+        ec2_list = sn_client.describe_instances()
+        ec2_list = ec2_list.get('Reservations')
+        sn_details, cluster_sn_details, all_sn_details = [], [], []
+        for sn in sn_list['Subnets']:
+            sn_id = sn['SubnetId']
+            sn_cidr = sn['CidrBlock']
+            sn_free_ip = sn['AvailableIpAddressCount']
+            sn_vpc = sn['VpcId'] 
+            sn_az = sn['AvailabilityZone']
+            sn_arn = sn['SubnetArn']
+            for tag in sn['Tags']:
+                if 'Name' in tag['Key']:
+                    sn_name = tag['Value']
+            sn_ec2_list = ''
+            for x in ec2_list:
+                for ec2 in x['Instances']:                  
+                    if ec2['SubnetId'] == sn_id:
+                        sn_ec2_list = sn_ec2_list + ec2['PrivateDnsName'] + ': ' + ec2['SecurityGroups'][0]['GroupName'].split('.', 1)[0] + '\n'
+            sn_ec2_list = sn_ec2_list.rstrip('\n')
+
+            sn_struct = [sn_name, str(sn_free_ip), sn_cidr, sn_az, sn_vpc, sn_id, sn_arn, sn_ec2_list]
+            if cluster in sn_struct[0]:
+                cluster_sn_details.append(sn_struct)
+            else:
+                all_sn_details.append(sn_struct)
+        if cluster:
+            sn_details = cluster_sn_details
+        else:
+            sn_details = all_sn_details
+        return sn_details
+

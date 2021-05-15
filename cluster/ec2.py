@@ -6,8 +6,6 @@ from modules.logging import Logger
 from modules.login import Login
 from modules.get_ec2 import GetEc2
 
-logger = Logger.get_logger('')
-
 def usage():
     parser=argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""This script can be used to cluster details from an AWS account.
@@ -31,29 +29,25 @@ class Ec2():
         bastion_header = ['BASTION NAME', 'DNS NAME', 'PUBLIC IP', 'START TIME']
         ec2 = Output.sort_data(ec2, sort)
         bastion = GetEc2.get_ec2_bastion(cluster)
-        if 'table' in output:
-            Output.print_table(ec2, ec2_header, True)
-            Output.print_table(bastion, bastion_header, True)
-        elif 'tree' in output:
-            Output.print_tree(ec2, ec2_header)
-            Output.print_tree(bastion, bastion_header)            
+        Output.print(ec2, ec2_header, output, logger)
+        Output.print(bastion, bastion_header, output, logger)
 
-
-    def get_ec2_volume_details(cluster, sort):
+    def get_ec2_volume_details(cluster, output, sort):
         ec2_ebs_vol = GetEc2.get_ec2_volumes(session, cluster)
         ec2_ebs_header = ['volume_id', 'name', 'state', 'encryption', 'device', 'delete_on_termination']
         ec2_ebs_vol = Output.sort_data(ec2_ebs_vol, sort)
-        Output.print_table(ec2_ebs_vol, ec2_ebs_header, True)
+        Output.print(ec2_ebs_vol, ec2_ebs_header, output, logger)
 
 def main():
-    global session
+    global session, logger
     options = GetOpts.get_opts()
+    logger = Logger.get_logger(options[3])
     if options[0]:
         usage()
     else:
         session = Login.aws_session(options[2], logger)
         Ec2.get_ec2_details(options[1], options[3], options[4])
-        # Cluster.get_ec2_volume_details(options[1], options[4])
+        #Ec2.get_ec2_volume_details(options[1], options[3], options[4])
     Output.time_taken(start_time)
 
 

@@ -46,15 +46,18 @@ class Output:
 
 
     # prints table from lists of lists: data
-    def print_table(data, headers, verbose):
+    def print_table(data, headers):
         try:
-            if verbose and len(data) != 0:
+            if len(data) != 0:
+                data = data[:6]
+                headers = headers[:6]
                 table = columnar(data, headers, no_borders=True, row_sep='-')
                 print (table)
         except:
             print("Empty/Incorrect data received!")
             exit()
 
+    # prints data in tree format from lists data and headers
     def print_tree(data, headers):
         h = sorted(headers[1:], key=len)
         for d in data:
@@ -75,17 +78,8 @@ class Output:
                 except:
                     pass
 
-    # prints analysis in bar format with %age, count and message
-    def print_json(i, data, headers):
-        # for i in range(len(headers)):
-        #     for d in data:
-        #         if not '\n' in d[i]:
-        #             for x in d[i].split("\n"):
-        #                 sub_key_json.append(x)
-        #             json_obj.update({headers[i].lower(): sub_key_json})
-        #         else:
-        #             json_obj.update({headers[i].lower(): d[i]})
-        
+    # prints data in json format from lists data and headers
+    def print_json(data, headers):
         json_data = []
         headers = [x.lower() for x in headers]
         for item in data:
@@ -104,3 +98,12 @@ class Output:
      
         print(json.dumps(json_data))
         return json.dumps(json_data)
+
+    def print(data, headers, format, logger):
+        headers = [x.upper() for x in headers]
+        if 'json' in format:
+            Output.print_json(data, headers)
+        elif 'tree' in format:
+            Output.print_tree(data, headers)
+        else:
+            Output.print_table(data, headers)

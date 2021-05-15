@@ -6,8 +6,6 @@ from modules.logging import Logger
 from modules.login import Login
 from modules.get_vpc import GetVPC
 
-logger = Logger.get_logger('')
-
 def usage():
     parser=argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""This script can be used to get network details from an AWS account.
@@ -23,33 +21,35 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
     parser.parse_args()
 
 class VPC():
-    def get_vpc_details(cluster, sort, verbose):
+    def get_vpc_details(cluster, output, sort):
         vpc =  GetVPC.get_vpc(session, cluster)
-        vpc_header = ['id', 'name', 'cidr', 'is_default', 'state', 'owner_id']
+        vpc_header = ['vpc_id', 'vpc_name', 'vpc_cidr', 'is_default', 'state', 'owner_id']
         vpc = Output.sort_data(vpc, sort)
-        Output.print_table(vpc, vpc_header, True)
+        Output.print(vpc, vpc_header, output, logger)
 
     def get_nacl_details(cluster, output, sort):
         nacl =  GetVPC.get_nacls(session, cluster) 
         nacl_header = ['ACL_NAME', 'IS_DEFAULT', 'VPC_ID', 'EGRESS_RULES', 'INGRESS_RULES', 'ACL_ID', 'SUBNETS']
         nacl = Output.sort_data(nacl, sort)
-        # Output.print_table(nacl, nacl_header, True)
-        if 'table' in output:
-            Output.print_table(nacl, nacl_header, True)
-        elif 'tree' in output: 
-            Output.print_tree(nacl, nacl_header)
-        elif 'json' in output:
-            Output.print_json('NACL', nacl, nacl_header)           
+        Output.print(nacl, nacl_header, output, logger)
+
+    def get_subnet_details(cluster, output, sort):      
+        subnets = GetVPC.get_subnets(session, cluster)
+        subnet_header = ['subnet_name', 'free_ip', 'cidr', 'az', 'vpc', 'id', 'arn', 'ec2_instances']
+        subnets = Output.sort_data(subnets, sort)
+        Output.print(subnets, subnet_header, output, logger)
 
 def main():
-    global session
+    global session, logger
     options = GetOpts.get_opts()
+    logger = Logger.get_logger(options[3])
     if options[0]:
         usage()
     else:
         session = Login.aws_session(options[2], logger)
-        # VPC.get_vpc_details(options[1], options[4], options[6])
-        VPC.get_nacl_details(options[1], options[3], options[4])
+        # VPC.get_vpc_details(options[1], options[3], options[4])
+        # VPC.get_nacl_details(options[1], options[3], options[4])
+        VPC.get_subnet_details(options[1], options[3], options[4])
     Output.time_taken(start_time)
 
 
