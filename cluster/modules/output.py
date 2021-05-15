@@ -1,7 +1,7 @@
 from columnar import columnar
 from click import style
 from packaging import version
-import os, re, time, requests, json
+import os, re, time, requests, json, ast
 #from .logging import Logger
 
 class Output:
@@ -49,7 +49,6 @@ class Output:
     def print_table(data, headers):
         try:
             if len(data) != 0:
-                data = data[:6]
                 headers = headers[:6]
                 table = columnar(data, headers, no_borders=True, row_sep='-')
                 print (table)
@@ -61,19 +60,28 @@ class Output:
     def print_tree(data, headers):
         h = sorted(headers[1:], key=len)
         for d in data:
-            heading = headers[0] + ": " + d[0]
+            heading = headers[0] + ": "
             Output.separator(Output.YELLOW, '.' , '')
-            print(heading)
+            print(heading + d[0])
             for i in range(len(headers)):
                 try:
                     #https://www.compart.com/en/unicode/mirrored
                     if not '\n' in d[i+1]:
                         print("".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1].ljust(len(h[-1])) + ": " + str(d[i+1]))
                     else:
-                        padding = "".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1]
-                        print(padding)
+                        i_padding = "".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1] + ": "
+                        print(i_padding)
                         for x in d[i+1].split("\n"):
-                            print("".ljust(len(padding)) + u"\u2309\u169B\u22B8" + str(x))                     
+                            # print("".ljust(len(i_padding)) + u"\u2309\u169B\u22B8" + str(x))
+                            if '[' in x:
+                                x = ast.literal_eval(x)                           
+                                for j in x:
+                                    y_padding = i_padding + u"\u2309\u169B\u22B8" + previous
+                                    print("".ljust(len(y_padding)) + u"\u2309\u169B\u22B8" + j)
+                            else:
+                                print("".ljust(len(i_padding)) + u"\u2309\u169B\u22B8" + x)
+                                previous = x
+
                     # print("".ljust(len(heading)) + u"\u2309\u169B\u22B8" + headers[i+1].ljust(len(h[-1])) + ": " + str(d[i+1]))
                 except:
                     pass

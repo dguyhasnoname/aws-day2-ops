@@ -91,3 +91,57 @@ class GetVPC():
             sn_details = all_sn_details
         return sn_details
 
+    def get_security_groups(session, cluster):
+        sg_client = session.client('ec2')
+        sg_list = sg_client.describe_security_groups()
+        sg_details, cluster_sg_details, all_sg_details = [], [], []
+        sg_name, sg_id, sg_desc, sg_vpc = [''] * 4
+        for sg in sg_list['SecurityGroups']:
+            sg_name = sg['GroupName']
+            sg_id = sg['GroupId']
+            sg_desc = sg['Description']
+            sg_vpc = sg['VpcId'] 
+            sg_inbound_rule = ''
+
+            for perm in sg['IpPermissions']:
+                try:
+                    inboud_ips, sg_related = [], []
+                    from_port, to_port, ip_protocol  = '', '', ''
+                    from_port, to_port, ip_protocol = str(perm['FromPort']), str(perm['ToPort']), str(perm['IpProtocol'])
+                    for ips in perm['IpRanges']:
+                        inboud_ips.append(ips['CidrIp'])
+                    if inboud_ips:
+                        sg_inbound_rule = sg_inbound_rule + from_port + ':' + to_port + '|' + ip_protocol + '\n' + str(inboud_ips) + '\n'
+                     
+                    for sg_relation in perm['UserIdGroupPairs']:
+                        sg_related.append(sg_relation['GroupId'])
+                    if sg_related:
+                        sg_inbound_rule = sg_inbound_rule + from_port + ':' + to_port + '|' + ip_protocol + '\n' + str(sg_related) + '\n'
+
+                    #sg_inbound_rule =  from_port + ':' + to_port + '|' + ip_protocol + '\n' + sg_inbound_rule         
+                except KeyError:
+                    pass
+
+            try:
+                cluster_tag = ''
+                for tag in sg['Tags']:
+                    if tag['Key'] == 'KubernetesCluster':
+                        cluster_tag = tag['Value']
+            except KeyError:
+                pass
+
+            sg_inbound_rule = sg_inbound_rule.rstrip('\n')
+            sg_struct = [sg_id, sg_name, sg_desc, sg_vpc, cluster_tag, sg_inbound_rule]
+
+            if cluster in sg_struct[-2]:
+                print("went in cluster loop")
+                cluster_sg_details.append(sg_struct)
+            else:
+                all_sg_details.append(sg_struct)
+        if cluster:
+            sg_details = cluster_sg_details
+        else:
+            sg_details = all_sg_details
+        return sg_details            
+
+            

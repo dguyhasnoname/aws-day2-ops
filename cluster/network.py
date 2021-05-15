@@ -39,6 +39,12 @@ class VPC():
         subnets = Output.sort_data(subnets, sort)
         Output.print(subnets, subnet_header, output, logger)
 
+    def get_security_group_details(cluster, output, sort):      
+        security_groups = GetVPC.get_security_groups(session, cluster)
+        security_group_header = ['security_group_id', 'sg_name', 'description', 'vpc', 'cluster_tag', 'inbound_rules']
+        security_groups = Output.sort_data(security_groups, sort)
+        Output.print(security_groups, security_group_header, output, logger)        
+
 def main():
     global session, logger
     options = GetOpts.get_opts()
@@ -49,7 +55,8 @@ def main():
         session = Login.aws_session(options[2], logger)
         # VPC.get_vpc_details(options[1], options[3], options[4])
         # VPC.get_nacl_details(options[1], options[3], options[4])
-        VPC.get_subnet_details(options[1], options[3], options[4])
+        # VPC.get_subnet_details(options[1], options[3], options[4])
+        VPC.get_security_group_details(options[1], options[3], options[4])
     Output.time_taken(start_time)
 
 
