@@ -88,8 +88,9 @@ class Output:
 
                                 # printing 4th level tree in else condition                          
                                 for j in x:
-                                    y_padding = i_padding + Output.MARKER + previous
-                                    print("".ljust(len(y_padding)) + Output.MARKER + j)
+                                    y_padding = len(i_padding + Output.MARKER + previous)
+                                    if y_padding > 50: y_padding = 50
+                                    print("".ljust(y_padding) + Output.MARKER + j)
                             else:
                                 print("".ljust(len(i_padding)) + Output.MARKER + x)
                                 previous = x
