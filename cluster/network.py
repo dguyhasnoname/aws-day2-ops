@@ -43,7 +43,25 @@ class VPC():
         security_groups = GetVPC.get_security_groups(session, cluster)
         security_group_header = ['security_group_id', 'sg_name', 'description', 'vpc', 'cluster_tag', 'inbound_rules']
         security_groups = Output.sort_data(security_groups, sort)
-        Output.print(security_groups, security_group_header, output, logger)        
+        Output.print(security_groups, security_group_header, output, logger)
+
+    def get_peering_connection_details(cluster, output, sort):
+        peering_connections = GetVPC.get_peering_connections(session, cluster)
+        peering_connections_header = ['peering_connection_id', 'name', 'status', \
+                         'acceptor_vpc_id', 'requestor_vpc_id', \
+                         'acceptor_vpc_cidr', 'equestor_vpc_cidr', \
+                         'acceptor_vpc_region', 'requestor_vpc_region', \
+                         'acceptor_owner_id', 'pc_requestor_owner_id', 'cluster_name']
+        peering_connections = Output.sort_data(peering_connections, sort)
+        Output.print(peering_connections, peering_connections_header, output, logger)        
+
+    def get_nat_gateway_details(cluster, output, sort):      
+        nat_gateway = GetVPC.get_nat_gateways(session, cluster)
+        nat_gateway_header = ['nat_gw_id', 'state', 'vpc_id', \
+                             'subnet_id', 'public_ip', 'pvt_ip', \
+                             'net_interface_id', 'creation_time' ]
+        nat_gateway = Output.sort_data(nat_gateway, sort)
+        Output.print(nat_gateway, nat_gateway_header, output, logger)
 
 def main():
     global session, logger
@@ -56,7 +74,9 @@ def main():
         # VPC.get_vpc_details(options[1], options[3], options[4])
         # VPC.get_nacl_details(options[1], options[3], options[4])
         # VPC.get_subnet_details(options[1], options[3], options[4])
-        VPC.get_security_group_details(options[1], options[3], options[4])
+        # VPC.get_security_group_details(options[1], options[3], options[4])
+        # VPC.get_peering_connection_details(options[1], options[3], options[4])
+        VPC.get_nat_gateway_details(options[1], options[3], options[4])
     Output.time_taken(start_time)
 
 

@@ -18,13 +18,15 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
     
     parser.add_argument('-s', '--sort', action="store_true", help="sort by. Default sorting is by name.")
     parser.add_argument('-c', '--cluster', action="store_true", help="cluster name for which details has to be fetched")
-    parser.add_argument('-d', '--delete', action="store_true", help="if flag set, deletes the volume.")
+    parser.add_argument('-d', '--delete', action="store_true", help="if flag set, deletes the volume for specific cluster")
     parser.parse_args()
 
 class EBS():
     def get_ebs_volumes_details(cluster, output, sort):
         ebs_volumes = GetEbs.get_ebs_volumes(session, cluster, logger)
-        ec2_ebs_header = ['volume_id', 'name', 'size', 'state', 'encryption', 'type', 'device', 'delete_on_termination', 'iops']
+        ec2_ebs_header = ['volume_id', 'name', 'size', 'state', 'encryption', \
+                            'type', 'device', 'delete_on_termination', 'iops', \
+                            'snapshot', 'az', 'creation_time', 'attach_time']
         ebs_volumes = Output.sort_data(ebs_volumes, sort)
         Output.print(ebs_volumes, ec2_ebs_header, output, logger)        
 
