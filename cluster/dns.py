@@ -4,9 +4,7 @@ from modules.getopts import GetOpts
 from modules.output import Output
 from modules.logging import Logger
 from modules.login import Login
-from modules.get_route53 import _Route53
-
-logger = Logger.get_logger('')
+from modules.get_route53 import GetRoute53
 
 def usage():
     parser=argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -24,24 +22,21 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
 
 class Route53():
 
-    def get_route53_details(cluster, sort, verbose):
-        if not cluster:
-            route53 = _Route53.get_route53(session)
-            route53_header = ['hosted_zone_id', 'name', 'records_count', 'private_zone', 'records']
-        else:
-            route53 = _Route53.get_route53_hosted_zones(session, cluster, verbose)
-            route53_header = ['App_dns', 'DNS/ELB']
+    def get_route53_details(cluster, output, sort):
+        route53 = GetRoute53.get_route53_hosted_zones(session, cluster)
+        route53_header = ['dns_zone_id', 'zone_name', 'records_count', 'zone_pvt?', 'dns_records']        
         route53 = Output.sort_data(route53, sort)
-        Output.print_table(route53, route53_header, True)     
+        Output.print(route53, route53_header, output, logger)     
 
 def main():
-    global session
+    global session, logger
     options = GetOpts.get_opts()
+    logger = Logger.get_logger( options[3])
     if options[0]:
         usage()
     else:
         session = Login.aws_session(options[2], logger)
-        Route53.get_route53_details(options[1], options[4], options[6])
+        Route53.get_route53_details(options[1], options[3], options[4])
     Output.time_taken(start_time)
 
 
