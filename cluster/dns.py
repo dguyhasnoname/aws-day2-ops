@@ -18,6 +18,7 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
     
     parser.add_argument('-s', '--sort', action="store_true", help="sort by. Default sorting is by name.")
     parser.add_argument('-c', '--cluster', action="store_true", help="cluster fqdn for which details has to be fetched")
+    parser.add_argument('-o', '--output', action="store_true", help="for output in json format pass json. Default is plain text on stdout")
     parser.parse_args()
 
 class Route53():
@@ -38,7 +39,6 @@ def main():
         session = Login.aws_session(options[2], logger)
         Route53.get_route53_details(options[1], options[3], options[4])
     Output.time_taken(start_time)
-
 
 if __name__ == "__main__":
     try:
