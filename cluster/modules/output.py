@@ -1,7 +1,7 @@
 from columnar import columnar
 from click import style
 from packaging import version
-import os, re, time, requests, json, ast
+import os, re, time, requests, json, ast, datetime, csv
 #from .logging import Logger
 
 class Output:
@@ -49,7 +49,6 @@ class Output:
             exit()
         return data
 
-
     # prints table from lists of lists: data
     def print_table(data, headers):
         try:
@@ -57,6 +56,7 @@ class Output:
                 headers = headers[:6]
                 table = columnar(data, headers, no_borders=True, row_sep='-')
                 print (table)
+                #print("Total: {}".format(len(data)))
         except:
             print("Empty/Incorrect data received!")
             exit()
@@ -97,6 +97,7 @@ class Output:
                     # print("".ljust(len(heading)) + Output.MARKER + headers[i+1].ljust(len(h[-1])) + ": " + str(d[i+1]))
                 except:
                     pass
+        #print("Total: {}".format(len(data)))
 
     # prints data in json format from lists data and headers
     def print_json(data, headers):
@@ -107,7 +108,7 @@ class Output:
             # storing json data in dict for each list in data
             for i in range(len(headers)):
                 for j in range(len(item)):
-                    if not '\n' in item[i]:
+                    if not '\n' in str(item[i]):
                         temp_dic.update({headers[i]: item[i]})
                     else:
                         item[i].split("\n")
@@ -117,7 +118,27 @@ class Output:
             json_data.append(temp_dic)
      
         print(json.dumps(json_data))
+
+        directory = './reports/json/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        # writing out json data in file based on object type and config being checked
+        filename = directory + headers[0] + str(time.time()) + '_report.json'
+        f = open(filename, 'w')
+        f.write(json.dumps(json_data))
+        f.close()       
         return json.dumps(json_data)
+
+    def csv_out(data, headers):
+        directory = './reports/csv/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        filename = directory + headers[0] + str(time.time()) + '_report.csv'
+        with open(filename, "w", newline="") as file:
+            writer = csv.writer(file, delimiter=',')
+            writer.writerow(i for i in headers)
+            for j in data:
+                writer.writerow(j)
 
     def print(data, headers, format, logger):
         headers = [x.upper() for x in headers]
@@ -125,5 +146,7 @@ class Output:
             Output.print_json(data, headers)
         elif 'tree' in format:
             Output.print_tree(data, headers)
+        elif 'csv' in format:
+            Output.csv_out(data, headers)
         else:
             Output.print_table(data, headers)
