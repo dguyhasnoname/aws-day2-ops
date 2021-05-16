@@ -29,7 +29,7 @@ class GetOpts:
             elif o in ("-u", "--update"):
                 update = a
             elif o in ("-d", "--delete"):
-                delete = True               
+                delete = True
 
         options = [help, cluster, profile, output, sort, filter, verbose, update, delete]
         return options
