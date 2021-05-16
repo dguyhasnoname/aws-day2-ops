@@ -133,9 +133,9 @@ class GetVPC():
             sg_inbound_rule = sg_inbound_rule.rstrip('\n')
             sg_struct = [sg_id, sg_name, sg_desc, sg_vpc, cluster_tag, sg_inbound_rule]
 
-            if cluster in sg_struct[-2]:
-                print("went in cluster loop")
-                cluster_sg_details.append(sg_struct)
+            if cluster:
+                if cluster in sg_struct[-2]:
+                    cluster_sg_details.append(sg_struct)
             else:
                 all_sg_details.append(sg_struct)
         if cluster:
@@ -144,4 +144,83 @@ class GetVPC():
             sg_details = all_sg_details
         return sg_details            
 
+    def get_peering_connections(session, cluster):
+        peering_client = session.client('ec2')
+        peering_list = peering_client.describe_vpc_peering_connections() 
+        cluster_peering_details, all_peering_details = [], []
+        pc_id, pc_status, pc_acceptor_vpc_id, pc_acceptor_vpc_region, \
+            pc_acceptor_vpc_cidr, pc_acceptor_owner_id, pc_requestor_vpc_id, pc_requestor_vpc_region, \
+            pc_requestor_vpc_cidr, pc_name, pc_cluster_name, pc_requestor_owner_id= [''] * 12
             
+        for peering in peering_list['VpcPeeringConnections']:
+            pc_id = peering['VpcPeeringConnectionId']
+            pc_status = peering['Status']['Code']
+            pc_acceptor_vpc_id = peering['AccepterVpcInfo']['VpcId']
+            pc_acceptor_vpc_region = peering['AccepterVpcInfo']['Region']
+            try:
+                pc_acceptor_vpc_cidr = peering['AccepterVpcInfo']['CidrBlock']
+            except KeyError:
+                pass
+            pc_acceptor_owner_id = peering['AccepterVpcInfo']['OwnerId']     
+            pc_requestor_vpc_id = peering['RequesterVpcInfo']['VpcId']
+            pc_requestor_vpc_region = peering['RequesterVpcInfo']['Region']
+            pc_requestor_vpc_cidr = peering['RequesterVpcInfo']['CidrBlock']
+            pc_requestor_owner_id = peering['RequesterVpcInfo']['OwnerId']
+
+            try:
+                for tag in peering['Tags']:
+                    if tag['Key'] == 'Name':
+                        pc_name = tag['Value']
+                    if tag['Key'] == 'KubernetesCluster':
+                        pc_cluster_name = tag['Value']
+            except:
+                pass
+
+            pc_struct = [pc_id, \
+                         pc_name, \
+                         pc_status, \
+                         pc_acceptor_vpc_id, \
+                         pc_requestor_vpc_id, \
+                         pc_acceptor_vpc_cidr, \
+                         pc_requestor_vpc_cidr, \
+                         pc_acceptor_vpc_region, \
+                         pc_requestor_vpc_region, \
+                         pc_acceptor_owner_id, \
+                         pc_requestor_owner_id, \
+                         pc_cluster_name]
+
+            if cluster:
+                if cluster in pc_struct[-1]:
+                    cluster_peering_details.append(pc_struct)
+            else:
+                all_peering_details.append(pc_struct)
+        if cluster:
+            return cluster_peering_details
+        else:
+            return all_peering_details
+
+    def get_nat_gateways(session, cluster):
+        nat_gw_client = session.client('ec2')
+        nat_gw_list = nat_gw_client.describe_nat_gateways() 
+        all_nat_gw_details = []
+        nat_gw_id, nat_gw_state, nat_gw_vpc_id, nat_gw_subnet_id, \
+        nat_gw_public_ip, nat_gw_pvt_ip, nat_gw_net_inf_id, nat_gw_create_time = [''] * 8
+        for nat_gw in nat_gw_list['NatGateways']:
+            nat_gw_id = nat_gw['NatGatewayId']
+            nat_gw_state = nat_gw['State']
+            nat_gw_vpc_id = nat_gw['VpcId']
+            nat_gw_subnet_id = nat_gw['SubnetId']
+            nat_gw_create_time = nat_gw['CreateTime']
+
+            for ad in nat_gw['NatGatewayAddresses']:
+                nat_gw_public_ip = ad['PublicIp']
+                nat_gw_pvt_ip = ad['PrivateIp']
+                nat_gw_net_inf_id = ad['NetworkInterfaceId']
+
+            nat_gw_struct = [nat_gw_id, nat_gw_state, nat_gw_vpc_id, \
+                             nat_gw_subnet_id, nat_gw_public_ip, nat_gw_pvt_ip, \
+                             nat_gw_net_inf_id, nat_gw_create_time]
+
+            all_nat_gw_details.append(nat_gw_struct)
+            
+        return all_nat_gw_details
