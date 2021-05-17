@@ -26,9 +26,10 @@ class ELB():
     def get_elb_details(cluster, output, sort):
         elb = GetElb.get_elb(session, cluster)
         elb = Output.sort_data(elb, sort)
-
-        elb_header = ['name', 'facing', 'listener', 'cluster', 'namespace', 'accesslogs', 'cross-zone', 'dns']
-
+        elb_header = ['elb_name', 'dns', 'facing', 'listener', 'cluster_name',  \
+                        'creation_time', 'namespace', 'elb_logs',  'elb_vpc', \
+                        'elb_sg', 'elb_subnets', 'cross_zone', 'az', \
+                        'hosted_zone_id']
         Output.print(elb, elb_header, output, logger)
 
 def main():
