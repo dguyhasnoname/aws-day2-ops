@@ -49,6 +49,9 @@ class Output:
             exit()
         return data
 
+    def summary(data_len, object_type):
+        print(Output.PURPLE + "\nTotal {} count: ".format(object_type) + Output.RESET + str(data_len))
+
     # prints table from lists of lists: data
     def print_table(data, headers):
         try:
