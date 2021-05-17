@@ -31,6 +31,7 @@ class ELB():
                         'elb_sg', 'elb_subnets', 'cross_zone', 'az', \
                         'hosted_zone_id']
         Output.print(elb, elb_header, output, logger)
+        Output.summary(len(elb), 'ELBs')
 
 def main():
     global session, logger
