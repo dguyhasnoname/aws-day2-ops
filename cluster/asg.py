@@ -6,9 +6,6 @@ from modules.logging import Logger
 from modules.login import Login
 from modules.get_asg import GetAsg
 
-global session
-logger = Logger.get_logger('')
-
 def usage():
     parser=argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""This script can be used to get/update autoscaling groups from an AWS account.
@@ -25,37 +22,40 @@ Before running script export AWS_REGION & AWS_PROFILE file as env:
     parser.parse_args()
 
 class ASG():
-    def get_asg_details(cluster, profile, sort):
+    def get_asg_details(cluster, profile, output, sort):
         session = Login.aws_session(profile, logger)
         asg = GetAsg.get_asg(session, cluster, logger)
         asg = Output.sort_data(asg, sort)
         asg_header = ['name', 'desired/min/max', 'lb', 'az']
-        Output.print_table(asg, asg_header, True)
+        Output.print(asg, asg_header, output, logger)
 
-    def update_asg_details(cluster, session, sort, update):     
+    def update_asg_details(cluster, session, output, sort, update):     
         if update:
             if cluster:
                 logger.info("Getting asg details.")
-                ASG.get_asg_details(cluster, session, sort, logger)
+                ASG.get_asg_details(cluster, session, output, sort)
                 if 'y' in input("Do you want to update asg intances? y|n: "):
                     GetAsg.update_asg(session, cluster, update, logger)
             else:
                 logger.warning("Please pass name of cluster for which asg needs to be updated!")
                 logger.info("Pulling asg details for all clusters.")
                 if 'y' in input("Do you want to get asg details for all clustes? y|n: "):
-                    ASG.get_asg_details(cluster, session, sort, logger)
+                    ASG.get_asg_details(cluster, session, output, sort)
 
 def main():
+    global session, logger
+    
     options = GetOpts.get_opts()
+    logger = Logger.get_logger(options[3])
     if options[0]:
         usage()
 
     if options[7]:
         #session = Login.aws_session(options[2])
-        ASG.update_asg_details(options[1], options[2], options[4], options[7])        
+        ASG.update_asg_details(options[1], options[2], options[3], options[4], options[7])        
     else:
         #session = Login.aws_session(options[2])
-        ASG.get_asg_details(options[1], options[2], options[4])
+        ASG.get_asg_details(options[1], options[2], options[3], options[4])
     Output.time_taken(start_time)
 
 if __name__ == "__main__":
