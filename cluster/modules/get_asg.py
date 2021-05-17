@@ -64,7 +64,7 @@ class GetAsg():
                 if 'master' in asg[0]:
                     logger.info("Updating asg {}".format(asg[0]))
                     update_auto_scaling_group(asg[0])
-            elif 'worker' in update:
+            elif 'worker' in update or 'nodes' in update:
                 if 'cpu' in asg[0]:
                     logger.info("Updating asg {}".format(asg[0]))
                     update_auto_scaling_group(asg[0])
