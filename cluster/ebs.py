@@ -26,7 +26,8 @@ class EBS():
         ebs_volumes = GetEbs.get_ebs_volumes(session, cluster, logger)
         ec2_ebs_header = ['volume_id', 'name', 'size', 'state', 'encryption', \
                             'type', 'device', 'delete_on_termination', 'iops', \
-                            'snapshot', 'az', 'creation_time', 'attach_time']
+                            'snapshot', 'az', 'creation_time', 'attach_time', \
+                            'pv', 'pvc', 'namespace']
         ebs_volumes = Output.sort_data(ebs_volumes, sort)
         Output.print(ebs_volumes, ec2_ebs_header, output, logger)        
 

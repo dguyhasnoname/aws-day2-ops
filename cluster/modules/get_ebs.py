@@ -7,7 +7,7 @@ class GetEbs():
         volume_details = paginator.paginate()
         for page in volume_details:
             for x in page['Volumes']:
-                volume_id, name, device, delete_condition, attach_time, creation_time  = [''] * 6
+                volume_id, name, pv_name, pvc_name, namespace, device, delete_condition, attach_time, creation_time  = [''] * 9
                 volume_id = x['VolumeId']
                 for a in x['Attachments']:
                     device = a['Device'] 
@@ -15,12 +15,31 @@ class GetEbs():
                     attach_time = a['AttachTime']
                 try:
                     for tag in x['Tags']:
-                        if tag['Key'] == 'Name':
+                        if tag['Key'] == 'KubernetesCluster':
                             name = tag['Value']
-                        elif tag['Key'] == 'KubernetesCluster':
+                        elif tag['Key'] == 'Name':
                             name = tag['Value']
                 except KeyError:
                     pass
+
+                try:
+                    for tag in x['Tags']:
+                        if tag['Key'] == 'kubernetes.io/created-for/pv/name':
+                            pv_name = tag['Value']
+                except KeyError:
+                    pass                              
+                try:
+                    for tag in x['Tags']:                            
+                        if tag['Key'] == 'kubernetes.io/created-for/pvc/name':
+                            pvc_name = tag['Value']
+                except KeyError:
+                    pass                              
+                try:
+                    for tag in x['Tags']:                            
+                        if tag['Key'] == 'kubernetes.io/created-for/pvc/namespace':
+                            namespace = tag['Value']
+                except KeyError:
+                    pass                                 
 
                 ebs_struct = [volume_id, \
                                 name, \
@@ -34,7 +53,10 @@ class GetEbs():
                                 x['SnapshotId'], \
                                 x['AvailabilityZone'], \
                                 str(x['CreateTime']), \
-                                str(attach_time)]
+                                str(attach_time), \
+                                pv_name, \
+                                pvc_name, \
+                                namespace]
 
                 ebs_struct = ['--' if x == '' else x for x in ebs_struct]
 
