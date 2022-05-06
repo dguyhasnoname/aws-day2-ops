@@ -1,6 +1,6 @@
 class GetIam():
     def get_iam_policy_json(session, cluster,iam_policy_arn):
-        global iam_client, iam_policy, policyJson
+        global iam_client, iam_policy, policyJson, newiam_policy
         iam_client = session.client('iam')
         iam_policy = iam_client.Policy(iam_policy_arn)
         policyJson = iam_policy.default_version.document
