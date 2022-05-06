@@ -17,29 +17,39 @@
 #         return all_asg_list
 
 
-class GetAsg():
+class GetAsg:
     def get_asg(session, cluster, logger):
         global asg_client, asg_data
-        asg_client = session.client('autoscaling')
-        paginator = asg_client.get_paginator('describe_auto_scaling_groups')
+        asg_client = session.client("autoscaling")
+        paginator = asg_client.get_paginator("describe_auto_scaling_groups")
         asg_list = paginator.paginate()
         cluster_asg_list, all_asg_list, asg_data = [], [], []
 
         for x in asg_list:
-            for asg in x['AutoScalingGroups']:
-                capacity = str(asg['DesiredCapacity']) + '/' + str(asg['MinSize']) + '/' + str(asg['MaxSize'])
-                lb_names, az = '', ''
-                for i in asg['LoadBalancerNames']:
-                    lb_names = lb_names + i + '\n'
-                lb_names = lb_names.rstrip('\n')
-                for j in asg['AvailabilityZones']:
-                    az = az + j + '\n'
-                az = az.rstrip('\n')                    
+            for asg in x["AutoScalingGroups"]:
+                capacity = (
+                    str(asg["DesiredCapacity"])
+                    + "/"
+                    + str(asg["MinSize"])
+                    + "/"
+                    + str(asg["MaxSize"])
+                )
+                lb_names, az = "", ""
+                for i in asg["LoadBalancerNames"]:
+                    lb_names = lb_names + i + "\n"
+                lb_names = lb_names.rstrip("\n")
+                for j in asg["AvailabilityZones"]:
+                    az = az + j + "\n"
+                az = az.rstrip("\n")
                 if cluster:
-                    if cluster in asg['AutoScalingGroupName']:
-                        cluster_asg_list.append([asg['AutoScalingGroupName'], capacity, lb_names, az])
+                    if cluster in asg["AutoScalingGroupName"]:
+                        cluster_asg_list.append(
+                            [asg["AutoScalingGroupName"], capacity, lb_names, az]
+                        )
                 else:
-                    all_asg_list.append([asg['AutoScalingGroupName'], capacity, lb_names, az])
+                    all_asg_list.append(
+                        [asg["AutoScalingGroupName"], capacity, lb_names, az]
+                    )
 
         if cluster_asg_list:
             asg_data = cluster_asg_list
@@ -51,28 +61,36 @@ class GetAsg():
         # asg_data = GetAsg.get_asg(session, cluster)
 
         def update_auto_scaling_group(asg):
-            update_asg = asg_client.update_auto_scaling_group(AutoScalingGroupName=asg, MinSize=0, MaxSize=0, DesiredCapacity=0)
-            if update_asg['ResponseMetadata']['HTTPStatusCode'] == 200:
-                logger.info("asg {} updated successfully. HTTPStatusCode: {} ".\
-                    format(asg, update_asg['ResponseMetadata']['HTTPStatusCode']))
+            update_asg = asg_client.update_auto_scaling_group(
+                AutoScalingGroupName=asg, MinSize=0, MaxSize=0, DesiredCapacity=0
+            )
+            if update_asg["ResponseMetadata"]["HTTPStatusCode"] == 200:
+                logger.info(
+                    "asg {} updated successfully. HTTPStatusCode: {} ".format(
+                        asg, update_asg["ResponseMetadata"]["HTTPStatusCode"]
+                    )
+                )
             else:
-                logger.warning("asg {} update failed. HTTPStatusCode: {} ".\
-                    format(asg, update_asg['ResponseMetadata']['HTTPStatusCode']))   
+                logger.warning(
+                    "asg {} update failed. HTTPStatusCode: {} ".format(
+                        asg, update_asg["ResponseMetadata"]["HTTPStatusCode"]
+                    )
+                )
 
         for asg in asg_data:
-            if 'master' in update:
-                if 'master' in asg[0]:
+            if "master" in update:
+                if "master" in asg[0]:
                     logger.info("Updating asg {}".format(asg[0]))
                     update_auto_scaling_group(asg[0])
-            elif 'worker' in update or 'nodes' in update:
-                if 'cpu' in asg[0]:
+            elif "worker" in update or "nodes" in update:
+                if "cpu" in asg[0]:
                     logger.info("Updating asg {}".format(asg[0]))
                     update_auto_scaling_group(asg[0])
-            elif 'etcd' in update:
-                if 'etcd' in asg[0]:
+            elif "etcd" in update:
+                if "etcd" in asg[0]:
                     logger.info("Updating asg {}".format(asg[0]))
                     update_auto_scaling_group(asg[0])
-            elif 'all' in update:
+            elif "all" in update:
                 logger.info("Updating asg {}".format(asg[0]))
                 update_auto_scaling_group(asg[0])
             else:
